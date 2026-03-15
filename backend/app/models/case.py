@@ -58,5 +58,7 @@ class CaseResponse(CaseBase):
     id: str
     case_number: str
     building_name: Optional[str] = None
+    floor_name: Optional[str] = None
+    unit_number: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

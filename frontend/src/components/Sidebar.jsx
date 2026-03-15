@@ -2,38 +2,47 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Building2, Users, ShoppingBag, CalendarCheck,
   Wrench, AlertTriangle, PhoneCall, DollarSign, Moon, ClipboardCheck,
-  Shield, BarChart2, ChevronDown, ChevronRight, Building, Settings
+  Shield, BarChart2, ChevronDown, ChevronRight, Building, Settings,
+  ClipboardList, Zap, Eye
 } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   {
-    label: 'Administration', icon: Settings, children: [
-      { to: '/buildings', label: 'Buildings', icon: Building2 },
-      { to: '/floors', label: 'Floors', icon: Building },
-      { to: '/units', label: 'Units', icon: Building },
-      { to: '/users', label: 'Users', icon: Users },
-      { to: '/vendors', label: 'Vendors & Cleaners', icon: ShoppingBag },
+    label: 'Planning', icon: ClipboardList, children: [
+      { to: '/cleaning',                label: 'Cleaning Schedule',       icon: CalendarCheck },
+      { to: '/maintenance/preventive',  label: 'Preventive Maintenance',  icon: Wrench },
+      { to: '/roster',                  label: 'Night Watch Roster',       icon: Moon },
     ]
   },
-  { to: '/cleaning', label: 'Cleaning Schedule', icon: CalendarCheck },
   {
-    label: 'Maintenance', icon: Wrench, children: [
-      { to: '/maintenance/preventive', label: 'Preventive', icon: Wrench },
-      { to: '/maintenance/corrective', label: 'Corrective', icon: AlertTriangle },
+    label: 'Action', icon: Zap, children: [
+      { to: '/maintenance/corrective',  label: 'Corrective Maintenance',  icon: AlertTriangle },
+      { to: '/cases',                   label: 'Cases & Calls',           icon: PhoneCall },
     ]
   },
-  { to: '/cases', label: 'Cases & Calls', icon: PhoneCall },
-  { to: '/costs', label: 'Cost Management', icon: DollarSign },
-  { to: '/roster', label: 'Night Watch Roster', icon: Moon },
+  {
+    label: 'Observe', icon: Eye, children: [
+      { to: '/costs',     label: 'Cost Management', icon: DollarSign },
+      { to: '/analytics', label: 'Analytics',       icon: BarChart2 },
+    ]
+  },
   {
     label: 'Attendance', icon: ClipboardCheck, children: [
-      { to: '/attendance/cleaner', label: 'Cleaner', icon: ClipboardCheck },
+      { to: '/attendance/cleaner',  label: 'Cleaner',  icon: ClipboardCheck },
       { to: '/attendance/security', label: 'Security', icon: Shield },
     ]
   },
-  { to: '/analytics', label: 'Analytics', icon: BarChart2 },
+  {
+    label: 'Administration', icon: Settings, children: [
+      { to: '/buildings', label: 'Buildings',         icon: Building2 },
+      { to: '/floors',    label: 'Floors',            icon: Building },
+      { to: '/units',     label: 'Units',             icon: Building },
+      { to: '/users',     label: 'Users',             icon: Users },
+      { to: '/vendors',   label: 'Vendors & Cleaners',icon: ShoppingBag },
+    ]
+  },
 ]
 
 function NavItem({ item, collapsed }) {

@@ -32,9 +32,13 @@ async def enrich_pm(db, m: dict) -> PreventiveMaintenanceResponse:
 async def enrich_cm(db, m: dict) -> CorrectiveMaintenanceResponse:
     building = await db.buildings.find_one({"_id": oid(m["building_id"])}) if m.get("building_id") else None
     vendor = await db.vendors.find_one({"_id": oid(m["assigned_vendor_id"])}) if m.get("assigned_vendor_id") else None
+    floor = await db.floors.find_one({"_id": oid(m["floor_id"])}) if m.get("floor_id") else None
+    unit = await db.units.find_one({"_id": oid(m["unit_id"])}) if m.get("unit_id") else None
     return CorrectiveMaintenanceResponse(
         id=str(m["_id"]),
         building_name=building["name"] if building else None,
+        floor_name=floor["name"] if floor else None,
+        unit_number=unit["unit_number"] if unit else None,
         vendor_name=vendor["name"] if vendor else None,
         **{k: v for k, v in m.items() if k != "_id"}
     )

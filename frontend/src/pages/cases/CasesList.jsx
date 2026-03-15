@@ -1,14 +1,57 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 import api from '../../api/axios'
 import DataTable from '../../components/DataTable'
 import Modal from '../../components/Modal'
 import StatusBadge from '../../components/StatusBadge'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 
 function CaseForm({ defaultValues, onSubmit, loading, buildings }) {
-  const { register, handleSubmit } = useForm({ defaultValues })
+  const { register, handleSubmit, control, setValue } = useForm({ defaultValues })
+  const selectedBuildingId = useWatch({ control, name: 'building_id' })
+  const selectedFloorId = useWatch({ control, name: 'floor_id' })
+
+  const [floors, setFloors] = useState([])
+  const [units, setUnits] = useState([])
+
+  useEffect(() => {
+    if (selectedBuildingId) {
+      api.get(`/api/buildings/${selectedBuildingId}/floors`).then(r => {
+        setFloors(r.data)
+        if (!defaultValues?.floor_id) setValue('floor_id', '')
+        setUnits([])
+        if (!defaultValues?.unit_id) setValue('unit_id', '')
+      }).catch(() => setFloors([]))
+    } else {
+      setFloors([])
+      setUnits([])
+    }
+  }, [selectedBuildingId])
+
+  useEffect(() => {
+    if (selectedBuildingId && selectedFloorId) {
+      api.get(`/api/buildings/${selectedBuildingId}/units?floor_id=${selectedFloorId}`).then(r => {
+        setUnits(r.data)
+        if (!defaultValues?.unit_id) setValue('unit_id', '')
+      }).catch(() => setUnits([]))
+    } else {
+      setUnits([])
+    }
+  }, [selectedFloorId])
+
+  // Preload floors/units when editing an existing record
+  useEffect(() => {
+    if (defaultValues?.building_id) {
+      api.get(`/api/buildings/${defaultValues.building_id}/floors`).then(r => {
+        setFloors(r.data)
+        if (defaultValues?.floor_id) {
+          api.get(`/api/buildings/${defaultValues.building_id}/units?floor_id=${defaultValues.floor_id}`).then(r2 => setUnits(r2.data))
+        }
+      })
+    }
+  }, [])
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
@@ -31,6 +74,22 @@ function CaseForm({ defaultValues, onSubmit, loading, buildings }) {
             <option value="emergency">Emergency</option>
             <option value="inquiry">Inquiry</option>
             <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Floor</label>
+          <select {...register('floor_id')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={!floors.length}>
+            <option value="">Select Floor</option>
+            {floors.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Unit</label>
+          <select {...register('unit_id')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={!units.length}>
+            <option value="">Select Unit</option>
+            {units.map(u => <option key={u.id} value={u.id}>{u.unit_number}{u.tenant_name ? ` – ${u.tenant_name}` : ''}</option>)}
           </select>
         </div>
       </div>
@@ -97,6 +156,8 @@ export default function CasesList() {
     { key: 'case_number', label: 'Case No', render: v => <span className="font-mono text-xs text-blue-600">{v}</span> },
     { key: 'title', label: 'Title' },
     { key: 'building_name', label: 'Building' },
+    { key: 'floor_name', label: 'Floor', render: v => v || '-' },
+    { key: 'unit_number', label: 'Unit', render: v => v || '-' },
     { key: 'category', label: 'Category', render: v => <span className="capitalize text-xs bg-slate-100 px-2 py-0.5 rounded">{v}</span> },
     { key: 'priority', label: 'Priority', render: v => <StatusBadge status={v} /> },
     { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
@@ -120,7 +181,12 @@ export default function CasesList() {
       <DataTable columns={columns} data={filtered} loading={isLoading} onSearch={setSearch} />
       {modal && (
         <Modal title={modal.type === 'create' ? 'New Case' : 'Edit Case'} onClose={() => setModal(null)} size="lg">
-          <CaseForm defaultValues={modal.data || { category: 'request', priority: 'medium', status: 'open' }} onSubmit={d => modal.type === 'create' ? createMut.mutate(d) : updateMut.mutate({ id: modal.data.id, ...d })} loading={createMut.isPending || updateMut.isPending} buildings={buildings} />
+          <CaseForm
+            defaultValues={modal.data || { category: 'request', priority: 'medium', status: 'open' }}
+            onSubmit={d => modal.type === 'create' ? createMut.mutate(d) : updateMut.mutate({ id: modal.data.id, ...d })}
+            loading={createMut.isPending || updateMut.isPending}
+            buildings={buildings}
+          />
         </Modal>
       )}
     </div>

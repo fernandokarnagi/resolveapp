@@ -117,4 +117,6 @@ class CorrectiveMaintenanceUpdate(BaseModel):
 class CorrectiveMaintenanceResponse(CorrectiveMaintenanceBase):
     id: str
     building_name: Optional[str] = None
+    floor_name: Optional[str] = None
+    unit_number: Optional[str] = None
     vendor_name: Optional[str] = None
