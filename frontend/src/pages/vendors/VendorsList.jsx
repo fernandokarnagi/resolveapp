@@ -42,7 +42,7 @@ function VendorForm({ defaultValues, onSubmit, loading }) {
           <input type="email" {...register('email')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Hourly Rate (RM)</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Hourly Rate (SGD)</label>
           <input type="number" step="0.01" {...register('hourly_rate')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
       </div>
@@ -94,7 +94,7 @@ export default function VendorsList() {
     { key: 'type', label: 'Type', render: v => <span className="capitalize px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">{v}</span> },
     { key: 'contact_person', label: 'Contact' },
     { key: 'phone', label: 'Phone' },
-    { key: 'hourly_rate', label: 'Rate (RM/hr)', render: v => v ? `RM ${v}` : '-' },
+    { key: 'hourly_rate', label: 'Rate (SGD/hr)', render: v => v ? `SGD ${v}` : '-' },
     { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
     {
       key: 'actions', label: '', render: (_, row) => (

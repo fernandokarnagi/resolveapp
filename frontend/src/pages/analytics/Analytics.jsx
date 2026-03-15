@@ -48,7 +48,7 @@ export default function Analytics() {
           { label: 'Occupancy Rate', value: `${stats?.occupancy_rate ?? 0}%`, color: 'bg-green-500' },
           { label: 'Open Cases', value: stats?.open_cases, color: 'bg-orange-500' },
           { label: 'Open Corrective Maintenance', value: stats?.open_corrective_maintenance, color: 'bg-red-500' },
-          { label: 'Monthly Cost', value: `RM ${(stats?.monthly_cost || 0).toLocaleString()}`, color: 'bg-purple-500' },
+          { label: 'Monthly Cost', value: `SGD ${(stats?.monthly_cost || 0).toLocaleString()}`, color: 'bg-purple-500' },
         ].map(kpi => (
           <div key={kpi.label} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
             <p className="text-sm text-slate-500">{kpi.label}</p>

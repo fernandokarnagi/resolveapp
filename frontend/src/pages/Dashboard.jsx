@@ -52,7 +52,7 @@ export default function Dashboard() {
         <StatCard label="Open Cases" value={stats?.open_cases} icon={AlertCircle} color="bg-orange-500" />
         <StatCard
           label="Monthly Cost"
-          value={`RM ${(stats?.monthly_cost ?? 0).toLocaleString()}`}
+          value={`SGD ${(stats?.monthly_cost ?? 0).toLocaleString()}`}
           icon={DollarSign}
           color="bg-purple-500"
         />

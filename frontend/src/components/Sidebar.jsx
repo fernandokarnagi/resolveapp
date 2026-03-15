@@ -2,21 +2,21 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Building2, Users, ShoppingBag, CalendarCheck,
   Wrench, AlertTriangle, PhoneCall, DollarSign, Moon, ClipboardCheck,
-  Shield, BarChart2, ChevronDown, ChevronRight, Building
+  Shield, BarChart2, ChevronDown, ChevronRight, Building, Settings
 } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   {
-    label: 'Building Mgmt', icon: Building2, children: [
+    label: 'Administration', icon: Settings, children: [
       { to: '/buildings', label: 'Buildings', icon: Building2 },
       { to: '/floors', label: 'Floors', icon: Building },
       { to: '/units', label: 'Units', icon: Building },
+      { to: '/users', label: 'Users', icon: Users },
+      { to: '/vendors', label: 'Vendors & Cleaners', icon: ShoppingBag },
     ]
   },
-  { to: '/users', label: 'Users', icon: Users },
-  { to: '/vendors', label: 'Vendors & Cleaners', icon: ShoppingBag },
   { to: '/cleaning', label: 'Cleaning Schedule', icon: CalendarCheck },
   {
     label: 'Maintenance', icon: Wrench, children: [

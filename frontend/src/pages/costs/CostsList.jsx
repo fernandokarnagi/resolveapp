@@ -32,7 +32,7 @@ function CostForm({ defaultValues, onSubmit, loading, buildings, vendors }) {
       </div>
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Amount (RM) *</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Amount (SGD) *</label>
           <input type="number" step="0.01" {...register('amount', { required: true })} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div>
@@ -99,7 +99,7 @@ export default function CostsList() {
     { key: 'building_name', label: 'Building' },
     { key: 'category', label: 'Category', render: v => <span className="capitalize text-xs bg-slate-100 px-2 py-0.5 rounded">{v}</span> },
     { key: 'description', label: 'Description' },
-    { key: 'amount', label: 'Amount', render: v => <span className="font-medium">RM {Number(v).toFixed(2)}</span> },
+    { key: 'amount', label: 'Amount', render: v => <span className="font-medium">SGD {Number(v).toFixed(2)}</span> },
     { key: 'vendor_name', label: 'Vendor' },
     { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
     {
@@ -117,7 +117,7 @@ export default function CostsList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-800">Cost Management</h1>
-          <p className="text-sm text-slate-500">Total: <span className="font-semibold text-slate-700">RM {total.toFixed(2)}</span></p>
+          <p className="text-sm text-slate-500">Total: <span className="font-semibold text-slate-700">SGD {total.toFixed(2)}</span></p>
         </div>
         <button onClick={() => setModal({ type: 'create' })} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"><Plus size={16} /> Add Cost</button>
       </div>
