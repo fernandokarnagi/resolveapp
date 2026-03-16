@@ -30,6 +30,7 @@ class CleaningScheduleBase(BaseModel):
     duration_minutes: Optional[int] = None
     schedule_days: Optional[List[str]] = None
     schedule_dates: Optional[List[int]] = None
+    contract_id: Optional[str] = None
     status: CleaningStatus = CleaningStatus.scheduled
     notes: Optional[str] = None
 
@@ -48,6 +49,7 @@ class CleaningScheduleUpdate(BaseModel):
     duration_minutes: Optional[int] = None
     schedule_days: Optional[List[str]] = None
     schedule_dates: Optional[List[int]] = None
+    contract_id: Optional[str] = None
     status: Optional[CleaningStatus] = None
     notes: Optional[str] = None
 
@@ -56,3 +58,4 @@ class CleaningScheduleResponse(CleaningScheduleBase):
     id: str
     building_name: Optional[str] = None
     vendor_name: Optional[str] = None
+    contract_number: Optional[str] = None

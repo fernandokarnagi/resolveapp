@@ -7,7 +7,7 @@ import Modal from '../../components/Modal'
 import StatusBadge from '../../components/StatusBadge'
 import { useForm } from 'react-hook-form'
 
-function BuildingForm({ defaultValues, onSubmit, loading }) {
+function BuildingForm({ defaultValues, onSubmit, loading, clients }) {
   const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues })
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -26,6 +26,13 @@ function BuildingForm({ defaultValues, onSubmit, loading }) {
         <input {...register('address', { required: true })} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
       <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Client</label>
+          <select {...register('client_id')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">No Client</option>
+            {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
           <select {...register('status')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -57,6 +64,7 @@ export default function BuildingsList() {
     queryKey: ['buildings'],
     queryFn: () => api.get('/api/buildings').then(r => r.data),
   })
+  const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: () => api.get('/api/clients').then(r => r.data) })
 
   const createMut = useMutation({
     mutationFn: (d) => api.post('/api/buildings', d),
@@ -78,6 +86,7 @@ export default function BuildingsList() {
 
   const columns = [
     { key: 'name', label: 'Name' },
+    { key: 'client_name', label: 'Client', render: v => v || '—' },
     { key: 'address', label: 'Address' },
     { key: 'total_floors', label: 'Floors' },
     { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
@@ -114,6 +123,7 @@ export default function BuildingsList() {
             defaultValues={modal.data || { status: 'active', total_floors: 0 }}
             onSubmit={(d) => modal.type === 'create' ? createMut.mutate(d) : updateMut.mutate({ id: modal.data.id, ...d })}
             loading={createMut.isPending || updateMut.isPending}
+            clients={clients}
           />
         </Modal>
       )}

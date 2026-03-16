@@ -16,6 +16,8 @@ import CostsList from './pages/costs/CostsList'
 import RosterList from './pages/roster/RosterList'
 import AttendancePage from './pages/attendance/AttendancePage'
 import Analytics from './pages/analytics/Analytics'
+import ClientsList from './pages/clients/ClientsList'
+import ContractsList from './pages/contracts/ContractsList'
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
                   <Route path="/attendance/cleaner" element={<AttendancePage attendanceType="cleaner" />} />
                   <Route path="/attendance/security" element={<AttendancePage attendanceType="security" />} />
                   <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/clients" element={<ClientsList />} />
+                  <Route path="/contracts" element={<ContractsList />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Layout>

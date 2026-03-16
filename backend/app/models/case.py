@@ -34,6 +34,7 @@ class CaseBase(BaseModel):
     category: CaseCategory = CaseCategory.request
     reported_by: Optional[str] = None
     contact_phone: Optional[str] = None
+    contract_id: Optional[str] = None
     status: CaseStatus = CaseStatus.open
     priority: CasePriority = CasePriority.medium
     assigned_to: Optional[str] = None
@@ -51,6 +52,7 @@ class CaseUpdate(BaseModel):
     status: Optional[CaseStatus] = None
     priority: Optional[CasePriority] = None
     assigned_to: Optional[str] = None
+    contract_id: Optional[str] = None
     resolution_notes: Optional[str] = None
 
 
@@ -60,5 +62,6 @@ class CaseResponse(CaseBase):
     building_name: Optional[str] = None
     floor_name: Optional[str] = None
     unit_number: Optional[str] = None
+    contract_number: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

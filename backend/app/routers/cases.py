@@ -27,11 +27,13 @@ async def enrich(db, c: dict) -> CaseResponse:
     building = await db.buildings.find_one({"_id": oid(c["building_id"])}) if c.get("building_id") else None
     floor = await db.floors.find_one({"_id": oid(c["floor_id"])}) if c.get("floor_id") else None
     unit = await db.units.find_one({"_id": oid(c["unit_id"])}) if c.get("unit_id") else None
+    contract = await db.contracts.find_one({"_id": oid(c["contract_id"])}) if c.get("contract_id") else None
     return CaseResponse(
         id=str(c["_id"]),
         building_name=building["name"] if building else None,
         floor_name=floor["name"] if floor else None,
         unit_number=unit["unit_number"] if unit else None,
+        contract_number=contract["contract_number"] if contract else None,
         created_at=c.get("created_at"),
         updated_at=c.get("updated_at"),
         **{k: v for k, v in c.items() if k not in ("_id", "created_at", "updated_at")}

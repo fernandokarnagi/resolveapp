@@ -7,7 +7,7 @@ import Modal from '../../components/Modal'
 import StatusBadge from '../../components/StatusBadge'
 import { useForm, useWatch } from 'react-hook-form'
 
-function CMForm({ defaultValues, onSubmit, loading, buildings, vendors }) {
+function CMForm({ defaultValues, onSubmit, loading, buildings, vendors, contracts }) {
   const { register, handleSubmit, control, setValue } = useForm({ defaultValues })
   const selectedBuildingId = useWatch({ control, name: 'building_id' })
   const selectedFloorId = useWatch({ control, name: 'floor_id' })
@@ -109,9 +109,18 @@ function CMForm({ defaultValues, onSubmit, loading, buildings, vendors }) {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Contract</label>
+          <select {...register('contract_id')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">No Contract</option>
+            {contracts.map(c => <option key={c.id} value={c.id}>{c.contract_number} – {c.title}</option>)}
+          </select>
+        </div>
+        <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Reported By</label>
           <input {...register('reported_by')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Vendor</label>
           <select {...register('assigned_vendor_id')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -155,6 +164,7 @@ export default function CorrectiveList() {
   const { data = [], isLoading } = useQuery({ queryKey: ['cm'], queryFn: () => api.get('/api/maintenance/corrective').then(r => r.data) })
   const { data: buildings = [] } = useQuery({ queryKey: ['buildings'], queryFn: () => api.get('/api/buildings').then(r => r.data) })
   const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => api.get('/api/vendors').then(r => r.data) })
+  const { data: contracts = [] } = useQuery({ queryKey: ['contracts'], queryFn: () => api.get('/api/contracts').then(r => r.data) })
 
   const createMut = useMutation({ mutationFn: d => api.post('/api/maintenance/corrective', d), onSuccess: () => { qc.invalidateQueries(['cm']); setModal(null) } })
   const updateMut = useMutation({ mutationFn: ({ id, ...d }) => api.put(`/api/maintenance/corrective/${id}`, d), onSuccess: () => { qc.invalidateQueries(['cm']); setModal(null) } })
@@ -197,6 +207,7 @@ export default function CorrectiveList() {
             loading={createMut.isPending || updateMut.isPending}
             buildings={buildings}
             vendors={vendors}
+            contracts={contracts}
           />
         </Modal>
       )}

@@ -1,11 +1,35 @@
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronLeft, ChevronRight, Search, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { useState, useMemo } from 'react'
 
 export default function DataTable({ columns, data, loading, onSearch, searchPlaceholder = 'Search...' }) {
   const [page, setPage] = useState(0)
+  const [sortKey, setSortKey] = useState(null)
+  const [sortDir, setSortDir] = useState('asc')
   const pageSize = 10
-  const paginated = data.slice(page * pageSize, (page + 1) * pageSize)
-  const totalPages = Math.ceil(data.length / pageSize)
+
+  const sorted = useMemo(() => {
+    if (!sortKey) return data
+    return [...data].sort((a, b) => {
+      const av = a[sortKey] ?? ''
+      const bv = b[sortKey] ?? ''
+      const cmp = String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' })
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+  }, [data, sortKey, sortDir])
+
+  const paginated = sorted.slice(page * pageSize, (page + 1) * pageSize)
+  const totalPages = Math.ceil(sorted.length / pageSize)
+
+  const handleSort = (col) => {
+    if (col.key === 'actions' || !col.label) return
+    if (sortKey === col.key) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortKey(col.key)
+      setSortDir('asc')
+    }
+    setPage(0)
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -26,11 +50,26 @@ export default function DataTable({ columns, data, loading, onSearch, searchPlac
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
-              {columns.map((col) => (
-                <th key={col.key} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  {col.label}
-                </th>
-              ))}
+              {columns.map((col) => {
+                const sortable = col.key !== 'actions' && col.label
+                const active = sortKey === col.key
+                return (
+                  <th
+                    key={col.key}
+                    onClick={() => sortable && handleSort(col)}
+                    className={`px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide select-none ${sortable ? 'cursor-pointer hover:text-slate-700' : ''}`}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      {col.label}
+                      {sortable && (
+                        active
+                          ? sortDir === 'asc' ? <ChevronUp size={13} className="text-blue-500" /> : <ChevronDown size={13} className="text-blue-500" />
+                          : <ChevronsUpDown size={13} className="text-slate-300" />
+                      )}
+                    </span>
+                  </th>
+                )
+              })}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">

@@ -25,10 +25,12 @@ async def enrich(db, r: dict) -> RosterResponse:
                 officer_names.append(u["name"])
         except Exception:
             pass
+    contract = await db.contracts.find_one({"_id": oid(r["contract_id"])}) if r.get("contract_id") else None
     return RosterResponse(
         id=str(r["_id"]),
         building_name=building["name"] if building else None,
         officer_names=officer_names,
+        contract_number=contract["contract_number"] if contract else None,
         **{k: v for k, v in r.items() if k != "_id"}
     )
 

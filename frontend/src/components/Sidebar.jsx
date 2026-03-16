@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Building2, Users, ShoppingBag, CalendarCheck,
   Wrench, AlertTriangle, PhoneCall, DollarSign, Moon, ClipboardCheck,
   Shield, BarChart2, ChevronDown, ChevronRight, Building, Settings,
-  ClipboardList, Zap, Eye, X
+  ClipboardList, Zap, Eye, X, Briefcase, FileText
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -13,7 +13,7 @@ const navItems = [
     label: 'Planning', icon: ClipboardList, children: [
       { to: '/cleaning',                label: 'Cleaning Schedule',       icon: CalendarCheck },
       { to: '/maintenance/preventive',  label: 'Preventive Maintenance',  icon: Wrench },
-      { to: '/roster',                  label: 'Night Watch Roster',       icon: Moon },
+      { to: '/roster',                  label: 'Security Roster',       icon: Moon },
     ]
   },
   {
@@ -36,6 +36,8 @@ const navItems = [
   },
   {
     label: 'Administration', icon: Settings, children: [
+      { to: '/clients',   label: 'Clients',           icon: Briefcase },
+      { to: '/contracts', label: 'Contracts',         icon: FileText },
       { to: '/buildings', label: 'Buildings',         icon: Building2 },
       { to: '/floors',    label: 'Floors',            icon: Building },
       { to: '/units',     label: 'Units',             icon: Building },

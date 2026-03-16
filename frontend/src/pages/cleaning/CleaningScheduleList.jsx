@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit, Trash2, List, CalendarDays } from 'lucide-react'
 import api from '../../api/axios'
 import DataTable from '../../components/DataTable'
 import Modal from '../../components/Modal'
 import StatusBadge from '../../components/StatusBadge'
+import ScheduleCalendar from '../../components/ScheduleCalendar'
 import { useForm } from 'react-hook-form'
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 const DAY_LABELS = { monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri', saturday: 'Sat', sunday: 'Sun' }
 
-function CleaningForm({ defaultValues, onSubmit, loading, buildings, vendors }) {
+function CleaningForm({ defaultValues, onSubmit, loading, buildings, vendors, contracts }) {
   const { register, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
       schedule_days: [],
@@ -139,6 +140,13 @@ function CleaningForm({ defaultValues, onSubmit, loading, buildings, vendors }) 
 
       <div className="grid grid-cols-2 gap-4">
         <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Contract</label>
+          <select {...register('contract_id')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">No Contract</option>
+            {contracts.map(c => <option key={c.id} value={c.id}>{c.contract_number} – {c.title}</option>)}
+          </select>
+        </div>
+        <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
           <select {...register('status')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="scheduled">Scheduled</option>
@@ -165,10 +173,12 @@ export default function CleaningScheduleList() {
   const qc = useQueryClient()
   const [modal, setModal] = useState(null)
   const [search, setSearch] = useState('')
+  const [view, setView] = useState('list')
 
   const { data = [], isLoading } = useQuery({ queryKey: ['cleaning'], queryFn: () => api.get('/api/cleaning').then(r => r.data) })
   const { data: buildings = [] } = useQuery({ queryKey: ['buildings'], queryFn: () => api.get('/api/buildings').then(r => r.data) })
   const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => api.get('/api/vendors').then(r => r.data) })
+  const { data: contracts = [] } = useQuery({ queryKey: ['contracts'], queryFn: () => api.get('/api/contracts').then(r => r.data) })
 
   const createMut = useMutation({ mutationFn: d => api.post('/api/cleaning', d), onSuccess: () => { qc.invalidateQueries(['cleaning']); setModal(null) } })
   const updateMut = useMutation({ mutationFn: ({ id, ...d }) => api.put(`/api/cleaning/${id}`, d), onSuccess: () => { qc.invalidateQueries(['cleaning']); setModal(null) } })
@@ -199,9 +209,18 @@ export default function CleaningScheduleList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div><h1 className="text-xl font-bold text-slate-800">Cleaning Schedule</h1></div>
-        <button onClick={() => setModal({ type: 'create' })} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"><Plus size={16} /> Add Schedule</button>
+        <div className="flex items-center gap-2">
+          <div className="flex rounded-lg border border-slate-200 overflow-hidden">
+            <button onClick={() => setView('list')} className={`px-3 py-2 text-sm flex items-center gap-1.5 ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}><List size={14} /> List</button>
+            <button onClick={() => setView('calendar')} className={`px-3 py-2 text-sm flex items-center gap-1.5 ${view === 'calendar' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}><CalendarDays size={14} /> Calendar</button>
+          </div>
+          <button onClick={() => setModal({ type: 'create' })} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"><Plus size={16} /> Add Schedule</button>
+        </div>
       </div>
-      <DataTable columns={columns} data={filtered} loading={isLoading} onSearch={setSearch} />
+      {view === 'calendar'
+        ? <ScheduleCalendar items={data} type="cleaning" buildings={buildings} vendors={vendors} />
+        : <DataTable columns={columns} data={filtered} loading={isLoading} onSearch={setSearch} />
+      }
       {modal && (
         <Modal title={modal.type === 'create' ? 'Add Schedule' : 'Edit Schedule'} onClose={() => setModal(null)} size="lg">
           <CleaningForm
@@ -210,6 +229,7 @@ export default function CleaningScheduleList() {
             loading={createMut.isPending || updateMut.isPending}
             buildings={buildings}
             vendors={vendors}
+            contracts={contracts}
           />
         </Modal>
       )}

@@ -56,6 +56,31 @@ function AttendanceForm({ defaultValues, onSubmit, loading, buildings, people, a
         <label className="block text-sm font-medium text-slate-700 mb-1">Notes</label>
         <textarea {...register('notes')} rows={2} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
+      {attendanceType === 'cleaner' && (
+        <>
+          <div className="border-t border-slate-200 pt-4">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Supervisor Review</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Supervisor Name</label>
+                <input {...register('supervisor_name')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Reviewed By</label>
+                <input {...register('reviewed_by')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Review Date & Time</label>
+              <input type="datetime-local" {...register('reviewed_datetime')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Review Remarks</label>
+              <textarea {...register('review_remarks')} rows={2} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+          </div>
+        </>
+      )}
       <div className="flex justify-end">
         <button type="submit" disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
           {loading ? 'Saving...' : 'Save'}
@@ -88,13 +113,24 @@ export default function AttendancePage({ attendanceType }) {
 
   const filtered = data.filter(a => a.person_name?.toLowerCase().includes(search.toLowerCase()))
 
-  const columns = [
+  const baseColumns = [
     { key: 'date', label: 'Date' },
     { key: 'person_name', label: attendanceType === 'cleaner' ? 'Cleaner' : 'Officer' },
     { key: 'building_name', label: 'Building' },
     { key: 'check_in_time', label: 'Check In', render: v => v || '-' },
     { key: 'check_out_time', label: 'Check Out', render: v => v || '-' },
     { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
+  ]
+
+  const cleanerExtraColumns = attendanceType === 'cleaner' ? [
+    { key: 'supervisor_name', label: 'Supervisor', render: v => v || '-' },
+    { key: 'reviewed_by', label: 'Reviewed By', render: v => v || '-' },
+    { key: 'reviewed_datetime', label: 'Review Date', render: v => v ? new Date(v).toLocaleString() : '-' },
+  ] : []
+
+  const columns = [
+    ...baseColumns,
+    ...cleanerExtraColumns,
     {
       key: 'actions', label: '', render: (_, row) => (
         <div className="flex gap-2">

@@ -1,12 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { Building2, AlertCircle, Wrench, DollarSign, Users, CalendarCheck, TrendingUp, Clock } from 'lucide-react'
 import StatusBadge from '../components/StatusBadge'
 import LoadingSpinner from '../components/LoadingSpinner'
 
-function StatCard({ label, value, icon: Icon, color, sub }) {
+function StatCard({ label, value, icon: Icon, color, sub, to }) {
+  const navigate = useNavigate()
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+    <div
+      onClick={() => to && navigate(to)}
+      className={`bg-white rounded-xl p-5 shadow-sm border border-slate-200 transition-shadow ${to ? 'cursor-pointer hover:shadow-md hover:border-slate-300' : ''}`}
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-slate-500 font-medium">{label}</p>
@@ -22,6 +27,7 @@ function StatCard({ label, value, icon: Icon, color, sub }) {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => api.get('/api/analytics/dashboard').then(r => r.data),
@@ -41,33 +47,36 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Buildings" value={stats?.total_buildings} icon={Building2} color="bg-blue-500" />
+        <StatCard label="Total Buildings" value={stats?.total_buildings} icon={Building2} color="bg-blue-500" to="/buildings" />
         <StatCard
           label="Occupancy Rate"
           value={`${stats?.occupancy_rate ?? 0}%`}
           icon={TrendingUp}
           color="bg-green-500"
           sub={`${stats?.occupied_units}/${stats?.total_units} units`}
+          to="/buildings"
         />
-        <StatCard label="Open Cases" value={stats?.open_cases} icon={AlertCircle} color="bg-orange-500" />
+        <StatCard label="Open Cases" value={stats?.open_cases} icon={AlertCircle} color="bg-orange-500" to="/cases" />
         <StatCard
           label="Monthly Cost"
           value={`SGD ${(stats?.monthly_cost ?? 0).toLocaleString()}`}
           icon={DollarSign}
           color="bg-purple-500"
+          to="/costs"
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Open Corrective Maintenance" value={stats?.open_corrective_maintenance} icon={Wrench} color="bg-red-500" />
-        <StatCard label="Overdue PM" value={stats?.overdue_preventive_maintenance} icon={Clock} color="bg-yellow-500" />
-        <StatCard label="Active Vendors" value={stats?.active_vendors} icon={Users} color="bg-teal-500" />
-        <StatCard label="Total Units" value={stats?.total_units} icon={CalendarCheck} color="bg-indigo-500" />
+        <StatCard label="Open Corrective Maintenance" value={stats?.open_corrective_maintenance} icon={Wrench} color="bg-red-500" to="/maintenance/corrective" />
+        <StatCard label="Overdue PM" value={stats?.overdue_preventive_maintenance} icon={Clock} color="bg-yellow-500" to="/maintenance/preventive" />
+        <StatCard label="Active Vendors" value={stats?.active_vendors} icon={Users} color="bg-teal-500" to="/vendors" />
+        <StatCard label="Total Units" value={stats?.total_units} icon={CalendarCheck} color="bg-indigo-500" to="/buildings" />
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div className="px-5 py-4 border-b border-slate-200">
+        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
           <h2 className="font-semibold text-slate-800">Recent Cases</h2>
+          <button onClick={() => navigate('/cases')} className="text-xs text-blue-600 hover:underline">View all</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -82,7 +91,7 @@ export default function Dashboard() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {(recentCases || []).map(c => (
-                <tr key={c.id} className="hover:bg-slate-50">
+                <tr key={c.id} onClick={() => navigate('/cases')} className="hover:bg-slate-50 cursor-pointer">
                   <td className="px-4 py-3 font-mono text-xs text-blue-600">{c.case_number}</td>
                   <td className="px-4 py-3 text-slate-700">{c.title}</td>
                   <td className="px-4 py-3 text-slate-500">{c.building_name || '-'}</td>

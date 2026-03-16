@@ -20,11 +20,20 @@ def oid(val: str):
 
 
 # ─── Buildings ────────────────────────────────────────────────
+async def enrich_building(db, b: dict) -> BuildingResponse:
+    client = await db.clients.find_one({"_id": oid(b["client_id"])}) if b.get("client_id") else None
+    return BuildingResponse(
+        id=str(b["_id"]),
+        client_name=client["name"] if client else None,
+        **{k: v for k, v in b.items() if k != "_id"}
+    )
+
+
 @router.get("", response_model=List[BuildingResponse])
 async def list_buildings(skip: int = 0, limit: int = 100, _=Depends(get_current_user)):
     db = get_db()
     buildings = await db.buildings.find().skip(skip).limit(limit).to_list(limit)
-    return [BuildingResponse(id=str(b["_id"]), **{k: v for k, v in b.items() if k != "_id"}) for b in buildings]
+    return [await enrich_building(db, b) for b in buildings]
 
 
 @router.post("", response_model=BuildingResponse)
@@ -32,7 +41,7 @@ async def create_building(data: BuildingCreate, _=Depends(get_current_user)):
     db = get_db()
     result = await db.buildings.insert_one(data.model_dump())
     b = await db.buildings.find_one({"_id": result.inserted_id})
-    return BuildingResponse(id=str(b["_id"]), **{k: v for k, v in b.items() if k != "_id"})
+    return await enrich_building(db, b)
 
 
 @router.get("/{building_id}", response_model=BuildingResponse)
@@ -41,7 +50,7 @@ async def get_building(building_id: str, _=Depends(get_current_user)):
     b = await db.buildings.find_one({"_id": oid(building_id)})
     if not b:
         raise HTTPException(status_code=404, detail="Building not found")
-    return BuildingResponse(id=str(b["_id"]), **{k: v for k, v in b.items() if k != "_id"})
+    return await enrich_building(db, b)
 
 
 @router.put("/{building_id}", response_model=BuildingResponse)
@@ -52,7 +61,7 @@ async def update_building(building_id: str, data: BuildingUpdate, _=Depends(get_
     b = await db.buildings.find_one({"_id": oid(building_id)})
     if not b:
         raise HTTPException(status_code=404, detail="Building not found")
-    return BuildingResponse(id=str(b["_id"]), **{k: v for k, v in b.items() if k != "_id"})
+    return await enrich_building(db, b)
 
 
 @router.delete("/{building_id}")

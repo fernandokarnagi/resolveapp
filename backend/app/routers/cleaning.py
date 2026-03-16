@@ -18,10 +18,12 @@ def oid(val: str):
 async def enrich(db, s: dict) -> CleaningScheduleResponse:
     building = await db.buildings.find_one({"_id": oid(s["building_id"])}) if s.get("building_id") else None
     vendor = await db.vendors.find_one({"_id": oid(s["assigned_vendor_id"])}) if s.get("assigned_vendor_id") else None
+    contract = await db.contracts.find_one({"_id": oid(s["contract_id"])}) if s.get("contract_id") else None
     return CleaningScheduleResponse(
         id=str(s["_id"]),
         building_name=building["name"] if building else None,
         vendor_name=vendor["name"] if vendor else None,
+        contract_number=contract["contract_number"] if contract else None,
         **{k: v for k, v in s.items() if k != "_id"}
     )
 

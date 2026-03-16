@@ -7,7 +7,7 @@ import Modal from '../../components/Modal'
 import StatusBadge from '../../components/StatusBadge'
 import { useForm, useWatch } from 'react-hook-form'
 
-function CaseForm({ defaultValues, onSubmit, loading, buildings }) {
+function CaseForm({ defaultValues, onSubmit, loading, buildings, contracts }) {
   const { register, handleSubmit, control, setValue } = useForm({ defaultValues })
   const selectedBuildingId = useWatch({ control, name: 'building_id' })
   const selectedFloorId = useWatch({ control, name: 'floor_id' })
@@ -125,6 +125,15 @@ function CaseForm({ defaultValues, onSubmit, loading, buildings }) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Description *</label>
         <textarea {...register('description', { required: true })} rows={3} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Contract</label>
+          <select {...register('contract_id')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">No Contract</option>
+            {contracts.map(c => <option key={c.id} value={c.id}>{c.contract_number} – {c.title}</option>)}
+          </select>
+        </div>
+      </div>
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Resolution Notes</label>
         <textarea {...register('resolution_notes')} rows={2} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -145,6 +154,7 @@ export default function CasesList() {
 
   const { data = [], isLoading } = useQuery({ queryKey: ['cases'], queryFn: () => api.get('/api/cases').then(r => r.data) })
   const { data: buildings = [] } = useQuery({ queryKey: ['buildings'], queryFn: () => api.get('/api/buildings').then(r => r.data) })
+  const { data: contracts = [] } = useQuery({ queryKey: ['contracts'], queryFn: () => api.get('/api/contracts').then(r => r.data) })
 
   const createMut = useMutation({ mutationFn: d => api.post('/api/cases', d), onSuccess: () => { qc.invalidateQueries(['cases']); setModal(null) } })
   const updateMut = useMutation({ mutationFn: ({ id, ...d }) => api.put(`/api/cases/${id}`, d), onSuccess: () => { qc.invalidateQueries(['cases']); setModal(null) } })
@@ -186,6 +196,7 @@ export default function CasesList() {
             onSubmit={d => modal.type === 'create' ? createMut.mutate(d) : updateMut.mutate({ id: modal.data.id, ...d })}
             loading={createMut.isPending || updateMut.isPending}
             buildings={buildings}
+            contracts={contracts}
           />
         </Modal>
       )}

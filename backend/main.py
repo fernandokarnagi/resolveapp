@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from app.database import connect_db, close_db
-from app.routers import auth, buildings, users, vendors, cleaning, maintenance, cases, costs, roster, attendance, analytics
+from app.routers import auth, buildings, users, vendors, cleaning, maintenance, cases, costs, roster, attendance, analytics, clients, contracts
 
 
 @asynccontextmanager
@@ -49,6 +49,8 @@ app.include_router(costs.router)
 app.include_router(roster.router)
 app.include_router(attendance.router)
 app.include_router(analytics.router)
+app.include_router(clients.router)
+app.include_router(contracts.router)
 
 # Serve built React frontend (populated by heroku-postbuild)
 static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "static")

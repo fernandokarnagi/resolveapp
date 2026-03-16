@@ -55,6 +55,7 @@ class PreventiveMaintenanceBase(BaseModel):
     start_time: Optional[str] = None
     duration_minutes: Optional[int] = None
     schedule_dates: Optional[List[int]] = None
+    contract_id: Optional[str] = None
     assigned_vendor_id: Optional[str] = None
     status: PMStatus = PMStatus.scheduled
     priority: MaintenancePriority = MaintenancePriority.medium
@@ -74,6 +75,7 @@ class PreventiveMaintenanceUpdate(BaseModel):
     start_time: Optional[str] = None
     duration_minutes: Optional[int] = None
     schedule_dates: Optional[List[int]] = None
+    contract_id: Optional[str] = None
     assigned_vendor_id: Optional[str] = None
     status: Optional[PMStatus] = None
     priority: Optional[MaintenancePriority] = None
@@ -84,6 +86,7 @@ class PreventiveMaintenanceResponse(PreventiveMaintenanceBase):
     id: str
     building_name: Optional[str] = None
     vendor_name: Optional[str] = None
+    contract_number: Optional[str] = None
 
 
 # --- Corrective Maintenance ---
@@ -97,6 +100,7 @@ class CorrectiveMaintenanceBase(BaseModel):
     reported_by: Optional[str] = None
     reported_date: str
     assigned_vendor_id: Optional[str] = None
+    contract_id: Optional[str] = None
     status: CMStatus = CMStatus.open
     priority: MaintenancePriority = MaintenancePriority.medium
     actual_cost: Optional[float] = None
@@ -113,6 +117,7 @@ class CorrectiveMaintenanceUpdate(BaseModel):
     description: Optional[str] = None
     category: Optional[MaintenanceCategory] = None
     assigned_vendor_id: Optional[str] = None
+    contract_id: Optional[str] = None
     status: Optional[CMStatus] = None
     priority: Optional[MaintenancePriority] = None
     actual_cost: Optional[float] = None
@@ -126,3 +131,4 @@ class CorrectiveMaintenanceResponse(CorrectiveMaintenanceBase):
     floor_name: Optional[str] = None
     unit_number: Optional[str] = None
     vendor_name: Optional[str] = None
+    contract_number: Optional[str] = None

@@ -24,6 +24,10 @@ class AttendanceBase(BaseModel):
     check_out_time: Optional[str] = None
     status: AttendanceStatus = AttendanceStatus.present
     notes: Optional[str] = None
+    supervisor_name: Optional[str] = None
+    reviewed_by: Optional[str] = None
+    reviewed_datetime: Optional[str] = None
+    review_remarks: Optional[str] = None
 
 
 class AttendanceCreate(AttendanceBase):
@@ -35,6 +39,10 @@ class AttendanceUpdate(BaseModel):
     check_out_time: Optional[str] = None
     status: Optional[AttendanceStatus] = None
     notes: Optional[str] = None
+    supervisor_name: Optional[str] = None
+    reviewed_by: Optional[str] = None
+    reviewed_datetime: Optional[str] = None
+    review_remarks: Optional[str] = None
 
 
 class AttendanceResponse(AttendanceBase):

@@ -28,6 +28,7 @@ class BuildingBase(BaseModel):
     total_floors: int = 0
     status: BuildingStatus = BuildingStatus.active
     description: Optional[str] = None
+    client_id: Optional[str] = None
 
 
 class BuildingCreate(BuildingBase):
@@ -40,10 +41,12 @@ class BuildingUpdate(BaseModel):
     total_floors: Optional[int] = None
     status: Optional[BuildingStatus] = None
     description: Optional[str] = None
+    client_id: Optional[str] = None
 
 
 class BuildingResponse(BuildingBase):
     id: str
+    client_name: Optional[str] = None
 
 
 # --- Floor ---
