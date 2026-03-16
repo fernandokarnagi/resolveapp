@@ -51,16 +51,21 @@ app.include_router(attendance.router)
 app.include_router(analytics.router)
 
 # Serve built React frontend (populated by heroku-postbuild)
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "static")
 if os.path.isdir(static_dir):
-    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
+    assets_dir = os.path.join(static_dir, "assets")
+    if os.path.isdir(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
     @app.get("/", include_in_schema=False)
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa(full_path: str = ""):
-        # API routes are handled above; everything else serves the SPA
-        index = os.path.join(static_dir, "index.html")
-        return FileResponse(index)
+        # Serve actual static files (favicon, etc.) if they exist
+        if full_path:
+            candidate = os.path.join(static_dir, full_path)
+            if os.path.isfile(candidate):
+                return FileResponse(candidate)
+        return FileResponse(os.path.join(static_dir, "index.html"))
 else:
     @app.get("/")
     async def root():

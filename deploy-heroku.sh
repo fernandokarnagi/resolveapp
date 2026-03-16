@@ -11,7 +11,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 set -e
 
-APP_NAME="${1:-resolveapp}"
+APP_NAME="${1:-resolveai}"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -73,6 +73,7 @@ heroku config:set \
   DATABASE_NAME=resolveapp \
   ALGORITHM=HS256 \
   ACCESS_TOKEN_EXPIRE_MINUTES=1440 \
+  NPM_CONFIG_PRODUCTION=false \
   --app "$APP_NAME"
 
 echo "  ✔ App config applied"

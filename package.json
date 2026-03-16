@@ -2,8 +2,8 @@
   "name": "resolveapp",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build && cp -r dist ../backend/static",
-    "heroku-postbuild": "cd frontend && npm install && npm run build && cp -r dist ../backend/static"
+    "build": "rm -rf backend/static && cd frontend && npm install && npm run build && cp -r dist ../backend/static",
+    "heroku-postbuild": "rm -rf backend/static && cd frontend && npm install --include=dev && npm run build && cp -r dist ../backend/static"
   },
   "engines": {
     "node": "20.x"
