@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 
 
@@ -26,6 +26,10 @@ class CleaningScheduleBase(BaseModel):
     frequency: CleaningFrequency = CleaningFrequency.daily
     start_date: str
     end_date: Optional[str] = None
+    start_time: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    schedule_days: Optional[List[str]] = None
+    schedule_dates: Optional[List[int]] = None
     status: CleaningStatus = CleaningStatus.scheduled
     notes: Optional[str] = None
 
@@ -40,6 +44,10 @@ class CleaningScheduleUpdate(BaseModel):
     frequency: Optional[CleaningFrequency] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
+    start_time: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    schedule_days: Optional[List[str]] = None
+    schedule_dates: Optional[List[int]] = None
     status: Optional[CleaningStatus] = None
     notes: Optional[str] = None
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 
 
@@ -52,6 +52,9 @@ class PreventiveMaintenanceBase(BaseModel):
     category: MaintenanceCategory = MaintenanceCategory.general
     frequency: PMFrequency = PMFrequency.monthly
     next_due_date: str
+    start_time: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    schedule_dates: Optional[List[int]] = None
     assigned_vendor_id: Optional[str] = None
     status: PMStatus = PMStatus.scheduled
     priority: MaintenancePriority = MaintenancePriority.medium
@@ -68,6 +71,9 @@ class PreventiveMaintenanceUpdate(BaseModel):
     category: Optional[MaintenanceCategory] = None
     frequency: Optional[PMFrequency] = None
     next_due_date: Optional[str] = None
+    start_time: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    schedule_dates: Optional[List[int]] = None
     assigned_vendor_id: Optional[str] = None
     status: Optional[PMStatus] = None
     priority: Optional[MaintenancePriority] = None

@@ -8,7 +8,23 @@ import StatusBadge from '../../components/StatusBadge'
 import { useForm } from 'react-hook-form'
 
 function PMForm({ defaultValues, onSubmit, loading, buildings, vendors }) {
-  const { register, handleSubmit } = useForm({ defaultValues })
+  const { register, handleSubmit, watch, setValue } = useForm({
+    defaultValues: {
+      schedule_dates: [],
+      ...defaultValues,
+    }
+  })
+
+  const frequency = watch('frequency')
+  const scheduleDates = watch('schedule_dates') || []
+
+  const toggleDate = (date) => {
+    const updated = scheduleDates.includes(date)
+      ? scheduleDates.filter(d => d !== date)
+      : [...scheduleDates, date]
+    setValue('schedule_dates', updated)
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
@@ -54,6 +70,42 @@ function PMForm({ defaultValues, onSubmit, loading, buildings, vendors }) {
           </select>
         </div>
       </div>
+
+      {/* Start Time & Duration */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Start Time</label>
+          <input type="time" {...register('start_time')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Duration (minutes)</label>
+          <input type="number" min={1} {...register('duration_minutes', { valueAsNumber: true })} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. 120" />
+        </div>
+      </div>
+
+      {/* Date selector for monthly frequency */}
+      {frequency === 'monthly' && (
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Dates of Month</label>
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({ length: 31 }, (_, i) => i + 1).map(n => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => toggleDate(n)}
+                className={`py-1.5 rounded text-xs font-medium transition-colors ${
+                  scheduleDates.includes(n)
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Vendor</label>
@@ -101,6 +153,8 @@ export default function PreventiveList() {
     { key: 'category', label: 'Category', render: v => <span className="capitalize text-xs bg-slate-100 px-2 py-0.5 rounded">{v?.replace('_', ' ')}</span> },
     { key: 'next_due_date', label: 'Next Due' },
     { key: 'frequency', label: 'Frequency', render: v => <span className="capitalize">{v}</span> },
+    { key: 'start_time', label: 'Time', render: v => v || '—' },
+    { key: 'duration_minutes', label: 'Duration', render: v => v ? `${v} min` : '—' },
     { key: 'priority', label: 'Priority', render: v => <StatusBadge status={v} /> },
     { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
     {
@@ -122,7 +176,13 @@ export default function PreventiveList() {
       <DataTable columns={columns} data={filtered} loading={isLoading} onSearch={setSearch} />
       {modal && (
         <Modal title={modal.type === 'create' ? 'Add Preventive Maintenance' : 'Edit PM'} onClose={() => setModal(null)} size="lg">
-          <PMForm defaultValues={modal.data || { category: 'general', frequency: 'monthly', priority: 'medium', status: 'scheduled' }} onSubmit={d => modal.type === 'create' ? createMut.mutate(d) : updateMut.mutate({ id: modal.data.id, ...d })} loading={createMut.isPending || updateMut.isPending} buildings={buildings} vendors={vendors} />
+          <PMForm
+            defaultValues={modal.data || { category: 'general', frequency: 'monthly', priority: 'medium', status: 'scheduled' }}
+            onSubmit={d => modal.type === 'create' ? createMut.mutate(d) : updateMut.mutate({ id: modal.data.id, ...d })}
+            loading={createMut.isPending || updateMut.isPending}
+            buildings={buildings}
+            vendors={vendors}
+          />
         </Modal>
       )}
     </div>
