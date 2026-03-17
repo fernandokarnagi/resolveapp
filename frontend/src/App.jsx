@@ -18,6 +18,7 @@ import AttendancePage from './pages/attendance/AttendancePage'
 import Analytics from './pages/analytics/Analytics'
 import ClientsList from './pages/clients/ClientsList'
 import ContractsList from './pages/contracts/ContractsList'
+import AskMe from './pages/AskMe'
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/clients" element={<ClientsList />} />
                   <Route path="/contracts" element={<ContractsList />} />
+                  <Route path="/ask-me" element={<AskMe />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Layout>
